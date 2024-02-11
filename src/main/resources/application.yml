@@ -1,0 +1,16 @@
+logging.level.org.springframework.aop: DEBUG
+logging.level.org.springframework.service: DEBUG
+school:
+    max-courses-per-student: ${MAX_COURSES_PER_STUDENT:3}
+spring:
+  config:
+    import: file:src/main/resources/.env[.properties]
+  datasource:
+    main:
+      driver-class-name: org.postgresql.Driver
+      jdbc-url: jdbc:postgresql://localhost:${POSTGRES_PORT}/${POSTGRES_DB}
+      username: ${POSTGRES_USER}
+      password: ${POSTGRES_PASSWORD}
+      hikari:
+        minimum-idle: 1
+        maximum-pool-size: 5

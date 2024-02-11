@@ -1,0 +1,10 @@
+insert into groups (group_name) values ('AB-45');
+insert into groups (group_name) values ('XY-32');
+insert into groups (group_name) values ('PQ-77');
+insert into groups (group_name) values ('CD-88');
+insert into groups (group_name) values ('EF-12');
+insert into groups (group_name) values ('JK-63');
+insert into groups (group_name) values ('LM-99');
+insert into groups (group_name) values ('UV-55');
+insert into groups (group_name) values ('WX-21');
+insert into groups (group_name) values ('RS-76');
