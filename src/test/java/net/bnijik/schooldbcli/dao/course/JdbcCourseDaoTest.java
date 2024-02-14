@@ -1,7 +1,7 @@
 package net.bnijik.schooldbcli.dao.course;
 
 import net.bnijik.schooldbcli.dao.Page;
-import net.bnijik.schooldbcli.model.Course;
+import net.bnijik.schooldbcli.entity.Course;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;

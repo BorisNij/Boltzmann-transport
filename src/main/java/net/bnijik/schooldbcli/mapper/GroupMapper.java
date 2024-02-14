@@ -1,7 +1,7 @@
 package net.bnijik.schooldbcli.mapper;
 
 import net.bnijik.schooldbcli.dto.GroupDto;
-import net.bnijik.schooldbcli.model.Group;
+import net.bnijik.schooldbcli.entity.Group;
 import org.mapstruct.Mapper;
 import org.mapstruct.MappingConstants;
 

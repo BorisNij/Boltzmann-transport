@@ -2,7 +2,7 @@ package net.bnijik.schooldbcli.dao.group;
 
 import net.bnijik.schooldbcli.dao.Dao;
 import net.bnijik.schooldbcli.dao.Page;
-import net.bnijik.schooldbcli.model.Group;
+import net.bnijik.schooldbcli.entity.Group;
 
 import java.util.List;
 import java.util.Optional;

@@ -1,7 +1,7 @@
 package net.bnijik.schooldbcli.mapper;
 
 import net.bnijik.schooldbcli.dto.StudentDto;
-import net.bnijik.schooldbcli.model.Student;
+import net.bnijik.schooldbcli.entity.Student;
 import net.bnijik.schooldbcli.service.course.CourseService;
 import net.bnijik.schooldbcli.service.group.GroupService;
 import org.mapstruct.Mapper;

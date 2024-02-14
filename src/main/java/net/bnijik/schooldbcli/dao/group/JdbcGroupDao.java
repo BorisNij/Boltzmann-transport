@@ -1,7 +1,7 @@
 package net.bnijik.schooldbcli.dao.group;
 
 import net.bnijik.schooldbcli.dao.Page;
-import net.bnijik.schooldbcli.model.Group;
+import net.bnijik.schooldbcli.entity.Group;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
