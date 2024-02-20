@@ -1,10 +1,12 @@
 package net.bnijik.schooldbcli.dao;
 
-import java.util.List;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Slice;
+
 import java.util.Optional;
 
 public interface Dao<T> {
-    List<T> findAll(Page page);
+    Slice<T> findAll(Pageable page);
 
     long save(T t);
 

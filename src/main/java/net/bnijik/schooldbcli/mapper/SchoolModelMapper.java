@@ -1,14 +1,13 @@
 package net.bnijik.schooldbcli.mapper;
 
-import java.util.Collection;
-import java.util.List;
+import org.springframework.data.domain.Slice;
 
 public interface SchoolModelMapper<M, D> {
     D modelToDto(M model);
 
     M dtoToModel(D dto);
 
-    List<D> modelsToDtos(Collection<M> models);
+    Slice<D> modelsToDtos(Iterable<M> models);
 
-    List<M> dtosToModels(Collection<D> dtos);
+    Slice<M> dtosToModels(Iterable<D> dtos);
 }

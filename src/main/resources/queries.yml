@@ -1,37 +1,3 @@
 course:
-    find-by-id: SELECT course_id, course_name, course_description FROM courses WHERE course_id = :courseId LIMIT 1
-    find-all: SELECT course_id, course_name, course_description FROM courses ORDER BY course_id LIMIT :limit OFFSET :offset
-    find-all-for-student:
-        SELECT courses.course_id, courses.course_name, courses.course_description
-        FROM student_course
-        JOIN courses ON student_course.course_id = courses.course_id
-        WHERE student_course.student_id = :studentId
-        LIMIT :limit OFFSET :offset
-    update: UPDATE courses SET course_name = :courseName, course_description = :courseDescription WHERE course_id = :courseId
-    delete-by-id: DELETE FROM courses WHERE course_id = :courseId
-group:
-    find-by-id: SELECT group_id, group_name FROM groups WHERE group_id = :groupId LIMIT 1
-    find-by-name: SELECT group_id, group_name FROM groups WHERE group_name = :groupName LIMIT 1
-    find-all: SELECT group_id, group_name FROM groups ORDER BY group_id LIMIT :limit OFFSET :offset
-    find-all-by-max-stud-count:
-        SELECT groups.group_id, groups.group_name
-        FROM groups
-        LEFT JOIN students ON groups.group_id = students.group_id
-        GROUP BY groups.group_id
-        HAVING COUNT(students.student_id) <= :studentCount
-        LIMIT :limit OFFSET :offset
-    update: UPDATE groups SET group_name = :groupName WHERE group_id = :groupId
-    delete-by-id: DELETE FROM groups WHERE group_id = :groupId
-student:
-    find-by-id: SELECT student_id, group_id, first_name, last_name FROM students WHERE student_id = :studentId LIMIT 1
-    find-all: SELECT student_id, group_id, first_name, last_name FROM students ORDER BY student_id LIMIT :limit OFFSET :offset
-    find-all-by-course-name:
-        SELECT students.student_id, students.first_name, students.last_name, students.group_id
-        FROM students
-        JOIN student_course ON students.student_id = student_course.student_id
-        JOIN courses ON student_course.course_id = courses.course_id
-        WHERE courses.course_name = :courseName
-    enroll-in-courses: INSERT INTO student_course (student_id, course_id) VALUES (:studentId, :courseId)
-    withdraw-from-course: DELETE FROM student_course WHERE student_id = :studentId AND course_id = :courseId
-    update: UPDATE students SET first_name = :firstName, last_name = :lastName, group_id = :groupId WHERE student_id = :studentId
-    delete-by-id: DELETE FROM students WHERE student_id = :studentId
+    find-all: SELECT c FROM Course c ORDER BY c.courseId
+    find-all-for-student: SELECT c FROM Course c JOIN c.students s WHERE s.studentId = :studentId

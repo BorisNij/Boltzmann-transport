@@ -4,6 +4,9 @@ import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.Accessors;
 
+import java.util.HashSet;
+import java.util.Set;
+
 @AllArgsConstructor
 @NoArgsConstructor
 @Getter
@@ -13,7 +16,8 @@ import lombok.experimental.Accessors;
 @Table(name = "courses")
 public class Course {
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "course_seq_generator")
+    @SequenceGenerator(name = "course_seq_generator", sequenceName = "courses_course_id_seq", allocationSize = 1)
     @Column(name = "course_id", updatable = false, nullable = false)
     private long courseId;
     @NonNull
@@ -21,6 +25,9 @@ public class Course {
     private String courseName;
     @Column(name = "course_description")
     private String courseDescription;
+    @ManyToMany(mappedBy = "courses")
+    @OrderBy("studentId")
+    private Set<Student> students = new HashSet<>();
 
     @Override
     public boolean equals(Object obj) {

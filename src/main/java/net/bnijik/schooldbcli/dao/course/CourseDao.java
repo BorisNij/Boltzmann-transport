@@ -1,11 +1,10 @@
 package net.bnijik.schooldbcli.dao.course;
 
 import net.bnijik.schooldbcli.dao.Dao;
-import net.bnijik.schooldbcli.dao.Page;
 import net.bnijik.schooldbcli.entity.Course;
-
-import java.util.List;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Slice;
 
 public interface CourseDao extends Dao<Course> {
-    List<Course> findAllForStudent(long studentId, Page page);
+    Slice<Course> findAllForStudent(long studentId, Pageable pageable);
 }

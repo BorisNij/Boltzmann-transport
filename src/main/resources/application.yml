@@ -1,16 +1,32 @@
-logging.level.org.springframework.aop: DEBUG
-logging.level.org.springframework.service: DEBUG
+logging:
+    level:
+        springframework.service: DEBUG
+        org.springframework.aop: DEBUG
+        org.hibernate.SQL: debug
+        org.hibernate.type.descriptor.sql.BasicBinder: trace
+
 school:
     max-courses-per-student: ${MAX_COURSES_PER_STUDENT:3}
 spring:
-  config:
-    import: file:src/main/resources/.env[.properties]
-  datasource:
-    main:
-      driver-class-name: org.postgresql.Driver
-      jdbc-url: jdbc:postgresql://localhost:${POSTGRES_PORT}/${POSTGRES_DB}
-      username: ${POSTGRES_USER}
-      password: ${POSTGRES_PASSWORD}
-      hikari:
-        minimum-idle: 1
-        maximum-pool-size: 5
+    config:
+        import: file:src/main/resources/.env[.properties]
+    datasource:
+        main:
+            driver-class-name: org.postgresql.Driver
+            jdbc-url: jdbc:postgresql://localhost:${POSTGRES_PORT}/${POSTGRES_DB}
+            username: ${POSTGRES_USER}
+            password: ${POSTGRES_PASSWORD}
+            hikari:
+                minimum-idle: 1
+                maximum-pool-size: 5
+    jpa:
+        database-platform: org.hibernate.dialect.PostgreSQLDialect
+        properties:
+            hibernate:
+                show_sql: false
+                format_sql: true
+                use_sql_comments: true
+                type: trace
+                jdbc:
+                    batch_size: 20
+        open-in-view: false
