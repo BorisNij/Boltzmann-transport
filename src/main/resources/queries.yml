@@ -1,3 +1,12 @@
 course:
     find-all: SELECT c FROM Course c ORDER BY c.courseId
     find-all-for-student: SELECT c FROM Course c JOIN c.students s WHERE s.studentId = :studentId
+group:
+    find-by-name: SELECT g FROM Group g WHERE g.groupName = :groupName
+    find-all: SELECT g FROM Group g ORDER BY g.groupId
+    find-all-by-max-stud-count:
+        SELECT g
+        FROM Group g
+        LEFT JOIN g.students s
+        GROUP BY g.groupId, g.groupName
+        HAVING COUNT(s) <= :studentCount

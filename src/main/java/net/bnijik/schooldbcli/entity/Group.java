@@ -6,6 +6,7 @@ import lombok.experimental.Accessors;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
 
 @AllArgsConstructor
@@ -18,10 +19,12 @@ import java.util.List;
 public class Group {
     @Getter(AccessLevel.NONE)
     @Setter(AccessLevel.NONE)
-    @OneToMany(mappedBy = "group", orphanRemoval = false, fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "group", fetch = FetchType.LAZY)
+    @OrderBy("studentId")
     private List<Student> students = new ArrayList<>();
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "group_seq_generator")
+    @SequenceGenerator(name = "group_seq_generator", sequenceName = "groups_group_id_seq", allocationSize = 1)
     @Column(name = "group_id", updatable = false, nullable = false)
     private long groupId;
     @NonNull
@@ -31,7 +34,7 @@ public class Group {
     public void students(final List<Student> students) {
         this.students.clear();
         students.stream()
-                .map(s -> new Student(s.studentId(), s.group(), s.firstName(), s.lastName()))
+                .map(s -> new Student(s.studentId(), s.group(), s.firstName(), s.lastName(), new HashSet<>()))
                 .forEach(this.students::add);
     }
 

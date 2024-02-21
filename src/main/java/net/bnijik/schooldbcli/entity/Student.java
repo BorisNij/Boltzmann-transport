@@ -4,6 +4,9 @@ import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.Accessors;
 
+import java.util.HashSet;
+import java.util.Set;
+
 @AllArgsConstructor
 @NoArgsConstructor
 @Getter
@@ -11,10 +14,7 @@ import lombok.experimental.Accessors;
 @Accessors(fluent = true)
 @Builder
 @Entity
-@Table(name = "students",
-        uniqueConstraints = {
-                @UniqueConstraint(columnNames = {"first_name", "last_name"})}
-)
+@Table(name = "students")
 public class Student {
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE)
@@ -29,6 +29,24 @@ public class Student {
     @NonNull
     @Column(name = "last_name", nullable = false)
     private String lastName;
+    @ManyToMany(cascade = {CascadeType.MERGE, CascadeType.PERSIST})
+    @JoinTable(name = "student_course",
+            joinColumns = @JoinColumn(name = "student_id"),
+            inverseJoinColumns = @JoinColumn(name = "course_id"))
+    @OrderBy("courseId")
+    @Builder.Default
+    private Set<Course> courses = new HashSet<>();
+
+    public void addCourse(Course course) {
+        courses.add(course);
+        course.students().add(this);
+    }
+
+    public void removeCourse(Course course) {
+        courses.remove(course);
+        course.students().remove(this);
+    }
+
 
     @Override
     public boolean equals(Object obj) {
