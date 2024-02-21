@@ -1,15 +1,14 @@
 package net.bnijik.schooldbcli.service.course;
 
-import net.bnijik.schooldbcli.dao.Page;
 import net.bnijik.schooldbcli.dao.course.CourseDao;
 import net.bnijik.schooldbcli.dto.CourseDto;
 import net.bnijik.schooldbcli.entity.Course;
 import net.bnijik.schooldbcli.mapper.CourseMapper;
 import net.bnijik.schooldbcli.service.SchoolAdminServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
-
-import java.util.List;
 
 @Service
 public class CourseServiceImpl extends SchoolAdminServiceImpl<CourseDto, Course> implements CourseService {
@@ -25,8 +24,8 @@ public class CourseServiceImpl extends SchoolAdminServiceImpl<CourseDto, Course>
     }
 
     @Override
-    public List<CourseDto> findAllForStudent(long studentId, Page page) {
-        final List<Course> courses = courseDao.findAllForStudent(studentId, page);
+    public Slice<CourseDto> findAllForStudent(long studentId, Pageable page) {
+        final Slice<Course> courses = courseDao.findAllForStudent(studentId, page);
         return courseMapper.modelsToDtos(courses);
     }
 

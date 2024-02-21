@@ -1,10 +1,10 @@
 package net.bnijik.schooldbcli.service;
 
 import net.bnijik.schooldbcli.dao.Dao;
-import net.bnijik.schooldbcli.dao.Page;
 import net.bnijik.schooldbcli.mapper.SchoolModelMapper;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Slice;
 
-import java.util.List;
 import java.util.Optional;
 
 public class SchoolAdminServiceImpl<D, M> implements SchoolAdminService<D> {
@@ -17,8 +17,8 @@ public class SchoolAdminServiceImpl<D, M> implements SchoolAdminService<D> {
     }
 
     @Override
-    public List<D> findAll(Page page) {
-        final List<M> all = dao.findAll(page);
+    public Slice<D> findAll(Pageable page) {
+        final Slice<M> all = dao.findAll(page);
         return schoolModelMapper.modelsToDtos(all);
     }
 

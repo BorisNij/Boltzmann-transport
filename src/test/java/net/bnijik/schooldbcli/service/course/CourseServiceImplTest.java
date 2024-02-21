@@ -1,6 +1,5 @@
 package net.bnijik.schooldbcli.service.course;
 
-import net.bnijik.schooldbcli.dao.Page;
 import net.bnijik.schooldbcli.dao.course.CourseDao;
 import net.bnijik.schooldbcli.dto.CourseDto;
 import net.bnijik.schooldbcli.entity.Course;
@@ -13,8 +12,11 @@ import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Slice;
 
-import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -41,7 +43,7 @@ class CourseServiceImplTest {
     private static Stream<Arguments> courseProvider() {
         return Stream.of(
                 Arguments.of(
-                        new Course(23L, "Some cool course", "Coolest description"),
+                        new Course(23L, "Some cool course", "Coolest description", new HashSet<>()),
                         new CourseDto(23L, "Some cool course", "Coolest description")
                 ));
     }
@@ -49,7 +51,7 @@ class CourseServiceImplTest {
     private static Stream<Arguments> courseDtoProvider() {
         List<String> strings = List.of("A", "B", "C");
         List<Course> courses = IntStream.range(0, strings.size())
-                .mapToObj(i -> new Course(i, strings.get(i), strings.get(i)))
+                .mapToObj(i -> new Course(i, strings.get(i), strings.get(i), new HashSet<>()))
                 .collect(Collectors.toList());
         List<CourseDto> dtos = IntStream.range(0, strings.size())
                 .mapToObj(i -> new CourseDto(i, strings.get(i), strings.get(i)))
@@ -74,12 +76,12 @@ class CourseServiceImplTest {
     @MethodSource("courseDtoProvider")
     @DisplayName("when finding all courses should return all courses")
     void whenFindingAllCoursesShouldReturnAllCourses(List<Course> courses, List<CourseDto> expected) {
-        when(courseDao.findAll(any(Page.class))).thenReturn(courses);
-        when(courseMapper.modelsToDtos(any(Collection.class))).thenReturn(expected);
+        when(courseDao.findAll(any(Pageable.class))).thenReturn(new PageImpl<>(courses));
+        when(courseMapper.modelsToDtos(any(Iterable.class))).thenReturn(new PageImpl<>(expected));
 
-        final List<CourseDto> actual = courseService.findAll(mock(Page.class));
+        final Slice<CourseDto> actual = courseService.findAll(mock(Pageable.class));
 
-        assertThat(actual).isEqualTo(expected);
+        assertThat(actual).isEqualTo(new PageImpl<>(expected));
     }
 
     @ParameterizedTest
@@ -118,10 +120,10 @@ class CourseServiceImplTest {
     void whenFindingAllCoursesForStudentShouldReturnAllCoursesWithinPage(List<Course> courses,
                                                                          List<CourseDto> expected) {
 
-        when(courseDao.findAllForStudent(any(Long.class), any(Page.class))).thenReturn(courses);
-        when(courseMapper.modelsToDtos(any(Collection.class))).thenReturn(expected);
+        when(courseDao.findAllForStudent(any(Long.class), any(Pageable.class))).thenReturn(new PageImpl<>(courses));
+        when(courseMapper.modelsToDtos(any(Iterable.class))).thenReturn(new PageImpl(expected));
 
-        assertThat(courseService.findAllForStudent(1, mock(Page.class))).isEqualTo(expected);
+        assertThat(courseService.findAllForStudent(1, mock(Pageable.class))).isEqualTo(new PageImpl<>(expected));
     }
 
 }
