@@ -1,6 +1,5 @@
 package net.bnijik.schooldbcli.service.group;
 
-import net.bnijik.schooldbcli.dao.Page;
 import net.bnijik.schooldbcli.dao.group.GroupDao;
 import net.bnijik.schooldbcli.dto.GroupDto;
 import net.bnijik.schooldbcli.entity.Group;
@@ -13,8 +12,11 @@ import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Slice;
+import org.springframework.data.domain.SliceImpl;
 
-import java.util.Collection;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.IntStream;
@@ -39,13 +41,15 @@ class GroupServiceImplTest {
 
 
     private static Stream<Arguments> groupProvider() {
-        return Stream.of(Arguments.of(new Group(23L, "Some cool group"),
+        return Stream.of(Arguments.of(new Group(new ArrayList<>(), 23L, "Some cool group"),
                                       new net.bnijik.schooldbcli.dto.GroupDto(23L, "Some cool group")));
     }
 
     private static Stream<Arguments> groupDtoProvider() {
         List<String> strings = List.of("A", "B", "C");
-        List<Group> groups = IntStream.range(0, strings.size()).mapToObj(i -> new Group(i, strings.get(i))).toList();
+        List<Group> groups = IntStream.range(0, strings.size())
+                .mapToObj(i -> new Group(new ArrayList<>(), i, strings.get(i)))
+                .toList();
         List<GroupDto> dtos = IntStream.range(0, strings.size())
                 .mapToObj(i -> new GroupDto(i, strings.get(i)))
                 .toList();
@@ -69,12 +73,12 @@ class GroupServiceImplTest {
     @MethodSource("groupDtoProvider")
     @DisplayName("when finding all groups should return all groups")
     void whenFindingAllGroupsShouldReturnAllGroups(List<Group> groups, List<GroupDto> expected) {
-        when(groupDao.findAll(any(Page.class))).thenReturn(groups);
-        when(groupMapper.modelsToDtos(any(Collection.class))).thenReturn(expected);
+        when(groupDao.findAll(any(Pageable.class))).thenReturn(new SliceImpl<>(groups));
+        when(groupMapper.modelsToDtos(any(Iterable.class))).thenReturn(new SliceImpl<>(expected));
 
-        final List<GroupDto> actual = groupService.findAll(mock(Page.class));
+        final Slice<GroupDto> actual = groupService.findAll(mock(Pageable.class));
 
-        assertThat(actual).isEqualTo(expected);
+        assertThat(actual).isEqualTo(new SliceImpl<>(expected));
     }
 
     @ParameterizedTest
@@ -122,11 +126,12 @@ class GroupServiceImplTest {
     @MethodSource("groupDtoProvider")
     @DisplayName("when finding all groups by max student count should return right groups")
     void whenFindingAllGroupsByMaxStudentCountShouldReturnRightGroups(List<Group> groups, List<GroupDto> expected) {
-        when(groupDao.findAllByMaxStudentCount(any(Integer.class), any(Page.class))).thenReturn(groups);
-        when(groupMapper.modelsToDtos(any(Collection.class))).thenReturn(expected);
+        when(groupDao.findAllByMaxStudentCount(any(Integer.class), any(Pageable.class))).thenReturn(new SliceImpl<>(
+                groups));
+        when(groupMapper.modelsToDtos(any(Iterable.class))).thenReturn(new SliceImpl<>(expected));
 
-        final List<GroupDto> actual = groupService.findAllByMaxStudentCount(1, mock(Page.class));
+        final Slice<GroupDto> actual = groupService.findAllByMaxStudentCount(1, mock(Pageable.class));
 
-        assertThat(actual).isEqualTo(expected);
+        assertThat(actual).isEqualTo(new SliceImpl<>(expected));
     }
 }

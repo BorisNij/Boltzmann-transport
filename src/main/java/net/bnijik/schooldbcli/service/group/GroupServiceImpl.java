@@ -1,15 +1,15 @@
 package net.bnijik.schooldbcli.service.group;
 
-import net.bnijik.schooldbcli.dao.Page;
 import net.bnijik.schooldbcli.dao.group.GroupDao;
 import net.bnijik.schooldbcli.dto.GroupDto;
 import net.bnijik.schooldbcli.entity.Group;
 import net.bnijik.schooldbcli.mapper.GroupMapper;
 import net.bnijik.schooldbcli.service.SchoolAdminServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -32,8 +32,8 @@ public class GroupServiceImpl extends SchoolAdminServiceImpl<GroupDto, Group> im
     }
 
     @Override
-    public List<GroupDto> findAllByMaxStudentCount(int maxStudentCount, Page page) {
-        final List<Group> groups = groupDao.findAllByMaxStudentCount(maxStudentCount, page);
+    public Slice<GroupDto> findAllByMaxStudentCount(int maxStudentCount, Pageable pageable) {
+        final Slice<Group> groups = groupDao.findAllByMaxStudentCount(maxStudentCount, pageable);
         return groupMapper.modelsToDtos(groups);
     }
 }
