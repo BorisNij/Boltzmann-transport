@@ -14,7 +14,10 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Slice;
 import org.springframework.test.context.jdbc.Sql;
 
-import java.util.*;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -35,10 +38,7 @@ class JpaStudentDaoTest {
                                               new Group(),
                                               "John",
                                               "Doe",
-                                              Set.of(new Course(123,
-                                                                "New course",
-                                                                "Description of new course",
-                                                                Collections.emptySet())));
+                                              Collections.emptySet());
 
         assertThat(studentDao.save(expectedStudent)).isEqualTo(4);
     }
@@ -93,7 +93,7 @@ class JpaStudentDaoTest {
     void whenFindingAllStudentsEnrolledInGivenCourseShouldReturnCorrectStudents() {
         final Student student1 = new Student(1, new Group(), "Jane", "Doe", Collections.emptySet());
         final Student student2 = new Student(2, new Group(), "Student", "ToRemove", Collections.emptySet());
-        final Course course2 = new Course(2, "Course2", "Description2", new HashSet<>());
+        final Course course2 = new Course(2, "Course2", "Description2", Collections.emptySet());
 
         final Slice<Student> students = studentDao.findAllByCourseName(course2.courseName(), PageRequest.of(0, 5));
 
@@ -109,8 +109,8 @@ class JpaStudentDaoTest {
         String course1Description = "Description1";
         String course2Name = "Course2";
         String course2Description = "Description2";
-        Course course1 = new Course(1, course1Name, course1Description, new HashSet<>());
-        Course course2 = new Course(2, course2Name, course2Description, new HashSet<>());
+        Course course1 = new Course(1, course1Name, course1Description, Collections.emptySet());
+        Course course2 = new Course(2, course2Name, course2Description, Collections.emptySet());
 
         assertThat(studentDao.enrollInCourses(existingStudent.studentId(),
                                               Arrays.asList(course1.courseId(), course2.courseId()))).isTrue();
