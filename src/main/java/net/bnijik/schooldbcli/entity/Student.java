@@ -17,7 +17,8 @@ import java.util.Set;
 @Table(name = "students")
 public class Student {
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "student_seq_generator")
+    @SequenceGenerator(name = "student_seq_generator", sequenceName = "students_student_id_seq", allocationSize = 1)
     @Column(name = "student_id", updatable = false, nullable = false)
     private long studentId;
     @ManyToOne(fetch = FetchType.LAZY)

@@ -10,3 +10,10 @@ group:
         LEFT JOIN g.students s
         GROUP BY g.groupId, g.groupName
         HAVING COUNT(s) <= :studentCount
+student:
+    find-all: SELECT s FROM Student s ORDER BY s.studentId
+    find-all-by-course-name:
+        SELECT s
+        FROM Student s
+        JOIN s.courses c
+        WHERE c.courseName = :courseName
