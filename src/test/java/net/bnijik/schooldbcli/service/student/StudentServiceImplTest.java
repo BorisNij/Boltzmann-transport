@@ -1,10 +1,10 @@
 package net.bnijik.schooldbcli.service.student;
 
-import net.bnijik.schooldbcli.dao.Page;
 import net.bnijik.schooldbcli.dao.student.StudentDao;
 import net.bnijik.schooldbcli.dto.CourseDto;
 import net.bnijik.schooldbcli.dto.GroupDto;
 import net.bnijik.schooldbcli.dto.StudentDto;
+import net.bnijik.schooldbcli.entity.Group;
 import net.bnijik.schooldbcli.entity.Student;
 import net.bnijik.schooldbcli.mapper.StudentMapper;
 import org.junit.jupiter.api.DisplayName;
@@ -16,9 +16,12 @@ import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Slice;
+import org.springframework.data.domain.SliceImpl;
 
 import java.util.Arrays;
-import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.IntStream;
@@ -42,27 +45,29 @@ class StudentServiceImplTest {
 
 
     private static Stream<Arguments> studentProvider() {
-        return Stream.of(Arguments.of(new Student(23L, 11L, "N1", "L1"),
+        return Stream.of(Arguments.of(new Student(23L, new Group(), "N1", "L1", Collections.emptySet()),
                                       new StudentDto(23L,
                                                      new GroupDto(11L, "AA-11"),
                                                      "N1",
                                                      "L1",
-                                                     List.of(new CourseDto(1L, "Math1", "Abcd"),
-                                                             new CourseDto(2L, "Math2", "Abcd2")))));
+                                                     new SliceImpl<>(List.of(new CourseDto(1L, "Math1", "Abcd"),
+                                                                             new CourseDto(2L, "Math2", "Abcd2"))))));
     }
 
     private static Stream<Arguments> studentDtoProvider() {
         List<String> strings = List.of("A", "B", "C");
         List<Student> students = IntStream.range(0, strings.size())
-                .mapToObj(i -> new Student(i, i, strings.get(i), strings.get(i)))
+                .mapToObj(i -> new Student(i, new Group(), strings.get(i), strings.get(i), Collections.emptySet()))
                 .toList();
         List<StudentDto> dtos = IntStream.range(0, strings.size())
                 .mapToObj(i -> new StudentDto(i,
                                               new GroupDto(i, strings.get(i)),
                                               strings.get(i),
                                               strings.get(i),
-                                              List.of(new CourseDto(i, strings.get(i), strings.get(i)),
-                                                      new CourseDto(i, strings.get(i), strings.get(i)))))
+                                              new SliceImpl<>(List.of(new CourseDto(i, strings.get(i), strings.get(i)),
+                                                                      new CourseDto(i,
+                                                                                    strings.get(i),
+                                                                                    strings.get(i))))))
                 .toList();
 
         return Stream.of(Arguments.of(students, dtos));
@@ -85,12 +90,12 @@ class StudentServiceImplTest {
     @MethodSource("studentDtoProvider")
     @DisplayName("when finding all students should return all students")
     void whenFindingAllStudentsShouldReturnAllStudents(List<Student> students, List<StudentDto> expected) {
-        when(studentDao.findAll(any(Page.class))).thenReturn(students);
-        when(studentMapper.modelsToDtos(any(Collection.class))).thenReturn(expected);
+        when(studentDao.findAll(any(Pageable.class))).thenReturn(new SliceImpl<>(students));
+        when(studentMapper.modelsToDtos(any(Iterable.class))).thenReturn(new SliceImpl<>(expected));
 
-        final List<StudentDto> actual = studentService.findAll(mock(Page.class));
+        final Slice<StudentDto> actual = studentService.findAll(mock(Pageable.class));
 
-        assertThat(actual).isEqualTo(expected);
+        assertThat(actual).isEqualTo(new SliceImpl<>(expected));
     }
 
     @ParameterizedTest
@@ -128,12 +133,13 @@ class StudentServiceImplTest {
     @DisplayName("when finding all students enrolled in course should return right students")
     void whenFindingAllStudentsEnrolledInCourseShouldReturnRightStudents(List<Student> students,
                                                                          List<StudentDto> expected) {
-        when(studentDao.findAllByCourseName(any(String.class), any(Page.class))).thenReturn(students);
-        when(studentMapper.modelsToDtos(any(Collection.class))).thenReturn(expected);
+        when(studentDao.findAllByCourseName(any(String.class),
+                                            any(Pageable.class))).thenReturn(new SliceImpl<>(students));
+        when(studentMapper.modelsToDtos(any(Iterable.class))).thenReturn(new SliceImpl<>(expected));
 
-        final List<StudentDto> actual = studentService.findAllByCourseName("course1", mock(Page.class));
+        final Slice<StudentDto> actual = studentService.findAllByCourseName("course1", mock(Pageable.class));
 
-        assertThat(actual).isEqualTo(expected);
+        assertThat(actual).isEqualTo(new SliceImpl<>(expected));
     }
 
     @Test

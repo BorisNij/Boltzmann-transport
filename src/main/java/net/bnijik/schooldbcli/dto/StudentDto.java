@@ -1,10 +1,11 @@
 package net.bnijik.schooldbcli.dto;
 
-import java.util.List;
+import org.springframework.data.domain.Slice;
+
 import java.util.Objects;
 import java.util.stream.Collectors;
 
-public record StudentDto(long studentId, GroupDto group, String firstName, String lastName, List<CourseDto> courses) {
+public record StudentDto(long studentId, GroupDto group, String firstName, String lastName, Slice<CourseDto> courses) {
 
     public StudentDto {
         Objects.requireNonNull(firstName);
@@ -24,7 +25,7 @@ public record StudentDto(long studentId, GroupDto group, String firstName, Strin
                 + "}";
     }
 
-    private String coursesToString(List<CourseDto> courses) {
+    private String coursesToString(Slice<CourseDto> courses) {
         String coursesString = courses.stream()
                 .map(course -> tabIndentCourses(course, 3))
                 .collect(Collectors.joining(",\n", "[\n", "\n\t]"));
