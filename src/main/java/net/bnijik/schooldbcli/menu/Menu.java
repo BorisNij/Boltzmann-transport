@@ -1,6 +1,5 @@
 package net.bnijik.schooldbcli.menu;
 
-import net.bnijik.schooldbcli.dao.Page;
 import net.bnijik.schooldbcli.dto.CourseDto;
 import net.bnijik.schooldbcli.dto.GroupDto;
 import net.bnijik.schooldbcli.dto.StudentDto;
@@ -10,6 +9,8 @@ import net.bnijik.schooldbcli.service.student.StudentService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Component;
 
 import java.util.*;
@@ -51,7 +52,7 @@ public class Menu implements ApplicationRunner {
         }
     }
 
-    private void processUserChoice(int choice, Scanner scanner) throws Exception {
+    private void processUserChoice(int choice, Scanner scanner) {
         switch (choice) {
             case 0:
                 System.out.println("Quitting...");
@@ -131,7 +132,7 @@ public class Menu implements ApplicationRunner {
         int studentCount = scanner.nextInt();
         scanner.nextLine();
 
-        List<GroupDto> groups = groupService.findAllByMaxStudentCount(studentCount, Page.of(1, 10));
+        Slice<GroupDto> groups = groupService.findAllByMaxStudentCount(studentCount, PageRequest.of(0, 10));
 
         if (!groups.isEmpty()) {
             System.out.printf("Groups with %d or less than %<d students:\n", studentCount);
@@ -145,7 +146,7 @@ public class Menu implements ApplicationRunner {
         System.out.print("Enter course name: ");
         String courseName = scanner.nextLine();
 
-        List<StudentDto> students = studentService.findAllByCourseName(courseName, Page.of(1, 50));
+        Slice<StudentDto> students = studentService.findAllByCourseName(courseName, PageRequest.of(0, 50));
         if (!students.isEmpty()) {
             System.out.printf("Students enrolled in %s course:\n", courseName);
             printIndexed(students, 3);
@@ -154,9 +155,11 @@ public class Menu implements ApplicationRunner {
         }
     }
 
-    private <T> void printIndexed(List<T> items, int indexLength) {
-        IntStream.range(0, items.size())
-                .forEach(i -> System.out.printf("%1$" + indexLength + "s. %2$s\n", i + 1, items.get(i)));
+    private <T> void printIndexed(Iterable<T> items, int indexLength) {
+        final ArrayList<T> itemList = new ArrayList<>();
+        items.forEach(itemList::add);
+        IntStream.range(0, itemList.size())
+                .forEach(i -> System.out.printf("%1$" + indexLength + "s. %2$s\n", i + 1, itemList.get(i)));
     }
 
     private void addStudent(Scanner scanner) {
