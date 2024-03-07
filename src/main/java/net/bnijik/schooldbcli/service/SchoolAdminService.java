@@ -14,5 +14,5 @@ public interface SchoolAdminService<T> {
 
     boolean update(T t, long id);
 
-    boolean delete(long id);
+    void delete(long id);
 }

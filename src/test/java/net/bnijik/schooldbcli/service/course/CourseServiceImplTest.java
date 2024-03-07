@@ -1,9 +1,9 @@
 package net.bnijik.schooldbcli.service.course;
 
-import net.bnijik.schooldbcli.dao.course.CourseDao;
 import net.bnijik.schooldbcli.dto.CourseDto;
 import net.bnijik.schooldbcli.entity.Course;
 import net.bnijik.schooldbcli.mapper.CourseMapper;
+import net.bnijik.schooldbcli.repository.course.CourseRepository;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -25,14 +25,13 @@ import java.util.stream.Stream;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 class CourseServiceImplTest {
 
     @Mock
-    CourseDao courseDao;
+    CourseRepository courseRepository;
 
     @Mock
     CourseMapper courseMapper;
@@ -43,8 +42,8 @@ class CourseServiceImplTest {
     private static Stream<Arguments> courseProvider() {
         return Stream.of(
                 Arguments.of(
-                        new Course(23L, "Some cool course", "Coolest description", new HashSet<>()),
-                        new CourseDto(23L, "Some cool course", "Coolest description")
+                        new Course(2L, "Some cool course", "Coolest description", new HashSet<>()),
+                        new CourseDto(2L, "Some cool course", "Coolest description")
                 ));
     }
 
@@ -64,7 +63,7 @@ class CourseServiceImplTest {
     @MethodSource("courseProvider")
     @DisplayName("when successfully saving course should return new course id")
     void whenSuccessfullySavingCourseShouldReturnNewCourseId(Course course, CourseDto courseDto) {
-        when(courseDao.save(any(Course.class))).thenReturn(course.courseId());
+        when(courseRepository.persist(any(Course.class))).thenReturn(course);
         when(courseMapper.dtoToModel(any(CourseDto.class))).thenReturn(course);
 
         final long newCourseId = courseService.save(courseDto);
@@ -76,7 +75,7 @@ class CourseServiceImplTest {
     @MethodSource("courseDtoProvider")
     @DisplayName("when finding all courses should return all courses")
     void whenFindingAllCoursesShouldReturnAllCourses(List<Course> courses, List<CourseDto> expected) {
-        when(courseDao.findAll(any(Pageable.class))).thenReturn(new PageImpl<>(courses));
+        when(courseRepository.findAll(any(Pageable.class))).thenReturn(new PageImpl<>(courses));
         when(courseMapper.modelsToDtos(any(Iterable.class))).thenReturn(new PageImpl<>(expected));
 
         final Slice<CourseDto> actual = courseService.findAll(mock(Pageable.class));
@@ -89,7 +88,7 @@ class CourseServiceImplTest {
     @DisplayName("when finding course by id should return the correct course")
     void whenFindingCourseByIdShouldReturnTheCorrectCourse(Course course, CourseDto courseDto) {
 
-        when(courseDao.findById(any(Long.class))).thenReturn(Optional.of(course));
+        when(courseRepository.findById(any(Long.class))).thenReturn(Optional.of(course));
         when(courseMapper.modelToDto(any(Course.class))).thenReturn(courseDto);
 
         assertThat(courseService.findById(course.courseId())).contains(courseDto);
@@ -99,19 +98,19 @@ class CourseServiceImplTest {
     @MethodSource("courseProvider")
     @DisplayName("when updated course successfully should return true")
     void whenUpdatedCourseSuccessfullyShouldReturnTrue(Course course, CourseDto courseDto) {
-        when(courseDao.update(any(Course.class), any(Long.class))).thenReturn(true);
+        when(courseRepository.update(any(Course.class))).thenReturn(course);
         when(courseMapper.dtoToModel(any(CourseDto.class))).thenReturn(course);
+        when(courseMapper.modelToDto(any(Course.class))).thenReturn(courseDto);
 
         assertThat(courseService.update(courseDto, course.courseId())).isTrue();
     }
 
     @ParameterizedTest
     @MethodSource("courseProvider")
-    @DisplayName("when successfully deleting course should return true")
-    void whenSuccessfullyDeletingCourseShouldReturnTrue(Course course) {
-        when(courseDao.delete(any(Long.class))).thenReturn(true);
-
-        assertThat(courseService.delete(course.courseId())).isTrue();
+    @DisplayName("when deleting course should use repo delete by id method")
+    void whenDeletingCourseShouldUseRepoDeleteByIdMethod(Course course) {
+        courseService.delete(course.courseId());
+        verify(courseRepository, times(1)).deleteById(course.courseId());
     }
 
     @ParameterizedTest
@@ -120,8 +119,9 @@ class CourseServiceImplTest {
     void whenFindingAllCoursesForStudentShouldReturnAllCoursesWithinPage(List<Course> courses,
                                                                          List<CourseDto> expected) {
 
-        when(courseDao.findAllForStudent(any(Long.class), any(Pageable.class))).thenReturn(new PageImpl<>(courses));
-        when(courseMapper.modelsToDtos(any(Iterable.class))).thenReturn(new PageImpl(expected));
+        when(courseRepository.findAllByStudentsStudentId(any(Long.class),
+                                                         any(Pageable.class))).thenReturn(new PageImpl<>(courses));
+        when(courseMapper.modelsToDtos(any(Iterable.class))).thenReturn(new PageImpl<>(expected));
 
         assertThat(courseService.findAllForStudent(1, mock(Pageable.class))).isEqualTo(new PageImpl<>(expected));
     }
