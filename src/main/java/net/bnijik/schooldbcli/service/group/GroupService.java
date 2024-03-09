@@ -1,7 +1,7 @@
 package net.bnijik.schooldbcli.service.group;
 
 import net.bnijik.schooldbcli.dto.GroupDto;
-import net.bnijik.schooldbcli.service.SchoolAdminService;
+import net.bnijik.schooldbcli.service.schoolAdmin.SchoolAdminService;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 

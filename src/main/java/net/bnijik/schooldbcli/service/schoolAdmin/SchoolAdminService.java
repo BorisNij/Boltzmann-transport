@@ -1,4 +1,4 @@
-package net.bnijik.schooldbcli.service;
+package net.bnijik.schooldbcli.service.schoolAdmin;
 
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
@@ -8,11 +8,11 @@ import java.util.Optional;
 public interface SchoolAdminService<T> {
     Slice<T> findAll(Pageable page);
 
-    long save(T t);
+    T create(T t);
 
     Optional<T> findById(long id);
 
-    boolean update(T t, long id);
+    T update(T t);
 
     void delete(long id);
 }
