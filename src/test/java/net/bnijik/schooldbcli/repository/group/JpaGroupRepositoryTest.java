@@ -3,6 +3,8 @@ package net.bnijik.schooldbcli.repository.group;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import net.bnijik.schooldbcli.entity.Group;
+import net.bnijik.schooldbcli.repository.GroupRepository;
+import net.bnijik.schooldbcli.repository.hibernate.HibernateRepositoryImpl;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -10,9 +12,11 @@ import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabas
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Slice;
+import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 import org.springframework.test.context.jdbc.Sql;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -30,53 +34,54 @@ class JpaGroupRepositoryTest {
     private EntityManager entityManager;
 
     @Test
-    @DisplayName("when saving group of certain name should save group")
-    void whenSavingGroupOfCertainNameShouldSaveGroup() {
+    @DisplayName("when creating new group of certain name should return new group")
+    void whenCreatingNewGroupOfCertainNameShouldReturnNewGroup() {
+        final Group expected = new Group().groupName("AAA-11");
 
-        final Group expected = new Group(new ArrayList<>(), 4, "AA-11");
+        final Group managedGroup = groupRepository.persist(expected);
 
-        assertThat(expected).isEqualTo(groupRepository.merge(expected));
+        assertThat(expected).isEqualTo(managedGroup);
+        assertThat(expected).isSameAs(managedGroup);
     }
 
 
     @Test
     @DisplayName("when finding a group by ID should return the correct group")
     void whenFindingAGroupByIdShouldReturnTheCorrectGroup() {
-        Group expectedGroup = new Group(new ArrayList<>(), 1L, "BB-22");
+        Group expectedGroup = new Group().groupId(1L);
 
         Optional<Group> groupOptional = groupRepository.findById(expectedGroup.groupId());
 
-        assertThat(groupOptional).contains(expectedGroup);
+        assertThat(groupOptional).hasValue(expectedGroup);
     }
 
 
     @Test
     @DisplayName("when finding a group by name should return the correct group")
     void whenFindingAGroupByNameShouldReturnTheCorrectGroup() {
-        Group createdGroup = new Group(new ArrayList<>(), 1, "BB-22");
+        Group createdGroup = new Group().groupId(1L).groupName("BB-22");
 
         Optional<Group> groupOptional = groupRepository.findByGroupName("BB-22");
 
-        assertThat(groupOptional).contains(createdGroup);
+        assertThat(groupOptional).hasValue(createdGroup);
     }
 
     @Test
     @DisplayName("when finding all groups should return a stream of all groups")
     void whenFindingAllGroupsShouldReturnAStreamOfAllGroups() {
 
-        final Slice<Group> groupStream = groupRepository.findAll(PageRequest.of(0, 5));
+        final Slice<Group> groupStream = groupRepository.findAll(PageRequest.of(0, 2));
 
-        assertThat(groupStream).containsExactly(new Group(new ArrayList<>(), 1L, "BB-22"),
-                                                new Group(new ArrayList<>(), 2L, "CC-33"),
-                                                new Group(new ArrayList<>(), 3L, "Group to Delete"));
+        assertThat(groupStream).containsExactly(new Group(Collections.emptyList(), 1L, "BB-22"),
+                                                new Group(Collections.emptyList(), 2L, "CC-33"));
     }
 
     @Test
     @DisplayName("when finding groups by max student count should return correct groups")
     void whenFindingGroupsByMaxStudentCountShouldReturnCorrectGroups() {
-        Group group1 = new Group(new ArrayList<>(), 1, "BB-22");
-        Group group2 = new Group(new ArrayList<>(), 2, "CC-33");
-        Group group3 = new Group(new ArrayList<>(), 3, "Group to Delete");
+        Group group1 = new Group(Collections.emptyList(), 1, "BB-22");
+        Group group2 = new Group(Collections.emptyList(), 2, "CC-33");
+        Group group3 = new Group(Collections.emptyList(), 3, "Group to Delete");
 
         Slice<Group> groups = groupRepository.findAllByMaxStudentCount(1, PageRequest.of(0, 5));
 
@@ -96,9 +101,15 @@ class JpaGroupRepositoryTest {
     @Test
     @DisplayName("when updating existing group should update group")
     void whenUpdatingExistingGroupShouldUpdateGroup() {
-        final Group modifiedGroupName = new Group(new ArrayList<>(), 3L, "Modified group name");
+        final Group modifiedGroup = new Group().groupId(3L).groupName("Modified group name");
+        final Group updated = groupRepository.update(modifiedGroup);
+        assertThat(updated).isEqualTo(modifiedGroup);
+        assertThat(updated).isSameAs(modifiedGroup);
 
-        assertThat(groupRepository.update(modifiedGroupName)).isEqualTo(modifiedGroupName);
+        entityManager.flush();
+        final Group group = entityManager.find(Group.class, modifiedGroup.groupId());
+        assertThat(group.groupName()).isEqualTo(modifiedGroup.groupName());
+        assertThat(group).isSameAs(modifiedGroup);
     }
 
 }

@@ -3,7 +3,7 @@ package net.bnijik.schooldbcli.service.course;
 import net.bnijik.schooldbcli.dto.CourseDto;
 import net.bnijik.schooldbcli.entity.Course;
 import net.bnijik.schooldbcli.mapper.CourseMapper;
-import net.bnijik.schooldbcli.repository.course.CourseRepository;
+import net.bnijik.schooldbcli.repository.CourseRepository;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -61,14 +61,16 @@ class CourseServiceImplTest {
 
     @ParameterizedTest
     @MethodSource("courseProvider")
-    @DisplayName("when successfully saving course should return new course id")
-    void whenSuccessfullySavingCourseShouldReturnNewCourseId(Course course, CourseDto courseDto) {
+    @DisplayName("when successfully creating new course should return new course")
+    void whenSuccessfullyCreatingNewCourseShouldReturnNewCourse(Course course, CourseDto courseDto) {
         when(courseRepository.persist(any(Course.class))).thenReturn(course);
         when(courseMapper.dtoToModel(any(CourseDto.class))).thenReturn(course);
+        when(courseMapper.modelToDto(any(Course.class))).thenReturn(courseDto);
 
-        final long newCourseId = courseService.save(courseDto);
+        final CourseDto created = courseService.create(courseDto);
 
-        assertThat(newCourseId).isEqualTo(course.courseId());
+        assertThat(created).isEqualTo(courseDto);
+        assertThat(created).isSameAs(courseDto);
     }
 
     @ParameterizedTest
@@ -76,11 +78,13 @@ class CourseServiceImplTest {
     @DisplayName("when finding all courses should return all courses")
     void whenFindingAllCoursesShouldReturnAllCourses(List<Course> courses, List<CourseDto> expected) {
         when(courseRepository.findAll(any(Pageable.class))).thenReturn(new PageImpl<>(courses));
-        when(courseMapper.modelsToDtos(any(Iterable.class))).thenReturn(new PageImpl<>(expected));
+        final PageImpl<CourseDto> expectedPageable = new PageImpl<>(expected);
+        when(courseMapper.modelsToDtos(any(Iterable.class))).thenReturn(expectedPageable);
 
         final Slice<CourseDto> actual = courseService.findAll(mock(Pageable.class));
 
-        assertThat(actual).isEqualTo(new PageImpl<>(expected));
+        assertThat(actual).isEqualTo(expectedPageable);
+        assertThat(actual).isSameAs(expectedPageable);
     }
 
     @ParameterizedTest
@@ -91,18 +95,21 @@ class CourseServiceImplTest {
         when(courseRepository.findById(any(Long.class))).thenReturn(Optional.of(course));
         when(courseMapper.modelToDto(any(Course.class))).thenReturn(courseDto);
 
-        assertThat(courseService.findById(course.courseId())).contains(courseDto);
+        final Optional<CourseDto> courseDtoOptional = courseService.findById(course.courseId());
+        assertThat(courseDtoOptional).containsSame(courseDto);
     }
 
     @ParameterizedTest
     @MethodSource("courseProvider")
-    @DisplayName("when updated course successfully should return true")
-    void whenUpdatedCourseSuccessfullyShouldReturnTrue(Course course, CourseDto courseDto) {
+    @DisplayName("when updated course successfully should return updated course")
+    void whenUpdatedCourseSuccessfullyShouldReturnUpdatedCourse(Course course, CourseDto courseDto) {
         when(courseRepository.update(any(Course.class))).thenReturn(course);
         when(courseMapper.dtoToModel(any(CourseDto.class))).thenReturn(course);
         when(courseMapper.modelToDto(any(Course.class))).thenReturn(courseDto);
 
-        assertThat(courseService.update(courseDto, course.courseId())).isTrue();
+        final CourseDto updated = courseService.update(courseDto);
+        assertThat(updated).isEqualTo(courseDto);
+        assertThat(updated).isSameAs(courseDto);
     }
 
     @ParameterizedTest
@@ -121,9 +128,12 @@ class CourseServiceImplTest {
 
         when(courseRepository.findAllByStudentsStudentId(any(Long.class),
                                                          any(Pageable.class))).thenReturn(new PageImpl<>(courses));
-        when(courseMapper.modelsToDtos(any(Iterable.class))).thenReturn(new PageImpl<>(expected));
+        final PageImpl<CourseDto> expectedPageable = new PageImpl<>(expected);
+        when(courseMapper.modelsToDtos(any(Iterable.class))).thenReturn(expectedPageable);
 
-        assertThat(courseService.findAllForStudent(1, mock(Pageable.class))).isEqualTo(new PageImpl<>(expected));
+        final Slice<CourseDto> courseDtos = courseService.findAllForStudent(1, mock(Pageable.class));
+        assertThat(courseDtos).isEqualTo(expectedPageable);
+        assertThat(courseDtos).isSameAs(expectedPageable);
     }
 
 }

@@ -3,6 +3,8 @@ package net.bnijik.schooldbcli.repository.course;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import net.bnijik.schooldbcli.entity.Course;
+import net.bnijik.schooldbcli.repository.CourseRepository;
+import net.bnijik.schooldbcli.repository.hibernate.HibernateRepositoryImpl;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -10,6 +12,7 @@ import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabas
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Slice;
+import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 import org.springframework.test.context.jdbc.Sql;
 
 import java.util.Collections;
@@ -36,24 +39,26 @@ class JpaCourseRepositoryTest {
         final Course expected = new Course(2L, "Course2", "Description2", Collections.emptySet());
         final Optional<Course> optionalCourse = courseRepository.findById(expected.courseId());
 
-        assertThat(optionalCourse).contains(expected);
+        assertThat(optionalCourse).hasValue(expected);
     }
 
     @Test
-    @DisplayName("when saving course should save course")
-    void whenSavingCourseOfCertainNameShouldSaveCourse() {
-        Course fourthCourse = new Course(4L, "Course3", "Course3 description", Collections.emptySet());
-        assertThat(courseRepository.merge(fourthCourse)).isEqualTo(fourthCourse);
+    @DisplayName("when creating new course should return new course")
+    void whenCreatingNewCourseShouldReturnNewCourse() {
+        final Course fourthCourse = new Course().courseName("Course3").courseDescription("Course3 description");
+
+        final Course managedCourse = courseRepository.persist(fourthCourse);
+        assertThat(managedCourse).isEqualTo(fourthCourse);
+        assertThat(managedCourse).isSameAs(fourthCourse);
     }
 
     @Test
     @DisplayName("when finding all courses page should return a list of all courses on page")
     void whenFindingAllCoursesPageShouldReturnAListOfAllCoursesOnPage() {
-        final Slice<Course> courses = courseRepository.findAll(PageRequest.of(0, 10));
+        final Slice<Course> courses = courseRepository.findAll(PageRequest.of(0, 2));
 
         assertThat(courses).containsExactly(new Course(1L, "Course1", "Description1", Collections.emptySet()),
-                                            new Course(2L, "Course2", "Description2", Collections.emptySet()),
-                                            new Course(3L, "Course to delete", "Description", Collections.emptySet()));
+                                            new Course(2L, "Course2", "Description2", Collections.emptySet()));
 
     }
 
@@ -68,7 +73,15 @@ class JpaCourseRepositoryTest {
     @DisplayName("when updating existing course should update course")
     void whenUpdatingExistingCourseShouldUpdateCourse() {
         final Course entity = new Course(3L, "Modified course name", "Modified description", Collections.emptySet());
-        assertThat(courseRepository.update(entity)).isEqualTo(entity);
+        final Course updatedEntity = courseRepository.update(entity);
+        assertThat(updatedEntity).isEqualTo(entity);
+        assertThat(updatedEntity).isSameAs(entity);
+
+        entityManager.flush();
+        final Course course = entityManager.find(Course.class, entity.courseId());
+        assertThat(course.courseName()).isEqualTo(updatedEntity.courseName());
+        assertThat(course.courseDescription()).isEqualTo(updatedEntity.courseDescription());
+        assertThat(course).isSameAs(entity);
     }
 
     @Test
