@@ -53,8 +53,8 @@ class JpaCourseRepositoryTest {
     }
 
     @Test
-    @DisplayName("when finding all courses page should return a list of all courses on page")
-    void whenFindingAllCoursesPageShouldReturnAListOfAllCoursesOnPage() {
+    @DisplayName("when finding all courses page should return slice of all courses on page")
+    void whenFindingAllCoursesPageShouldReturnSliceOfAllCoursesOnPage() {
         final Slice<Course> courses = courseRepository.findAll(PageRequest.of(0, 2));
 
         assertThat(courses).containsExactly(new Course(1L, "Course1", "Description1", Collections.emptySet()),
@@ -67,6 +67,10 @@ class JpaCourseRepositoryTest {
     void whenDeletingCourseByIdShouldRemoveFromDatabase() {
         courseRepository.deleteById(3L);
         assertThat(entityManager.find(Course.class, 3L)).isNull();
+
+        entityManager.flush();
+        entityManager.clear();
+        assertThat(entityManager.find(Course.class, 3L)).isNull();
     }
 
     @Test
@@ -78,10 +82,10 @@ class JpaCourseRepositoryTest {
         assertThat(updatedEntity).isSameAs(entity);
 
         entityManager.flush();
+        entityManager.clear();
         final Course course = entityManager.find(Course.class, entity.courseId());
         assertThat(course.courseName()).isEqualTo(updatedEntity.courseName());
         assertThat(course.courseDescription()).isEqualTo(updatedEntity.courseDescription());
-        assertThat(course).isSameAs(entity);
     }
 
     @Test

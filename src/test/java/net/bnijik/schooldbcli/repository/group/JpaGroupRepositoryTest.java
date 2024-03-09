@@ -67,8 +67,8 @@ class JpaGroupRepositoryTest {
     }
 
     @Test
-    @DisplayName("when finding all groups should return a stream of all groups")
-    void whenFindingAllGroupsShouldReturnAStreamOfAllGroups() {
+    @DisplayName("when finding all groups page should return slice of all groups")
+    void whenFindingAllGroupsPageShouldReturnSliceOfAllGroups() {
 
         final Slice<Group> groupStream = groupRepository.findAll(PageRequest.of(0, 2));
 
@@ -96,6 +96,10 @@ class JpaGroupRepositoryTest {
         groupRepository.deleteById(groupToDelete.groupId());
 
         assertThat(entityManager.find(Group.class, groupToDelete.groupId())).isNull();
+
+        entityManager.flush();
+        entityManager.clear();
+        assertThat(entityManager.find(Group.class, groupToDelete.groupId())).isNull();
     }
 
     @Test
@@ -107,9 +111,9 @@ class JpaGroupRepositoryTest {
         assertThat(updated).isSameAs(modifiedGroup);
 
         entityManager.flush();
+        entityManager.clear();
         final Group group = entityManager.find(Group.class, modifiedGroup.groupId());
         assertThat(group.groupName()).isEqualTo(modifiedGroup.groupName());
-        assertThat(group).isSameAs(modifiedGroup);
     }
 
 }
