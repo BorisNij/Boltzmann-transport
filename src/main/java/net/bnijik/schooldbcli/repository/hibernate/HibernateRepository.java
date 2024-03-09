@@ -1,4 +1,4 @@
-package net.bnijik.schooldbcli.repository;
+package net.bnijik.schooldbcli.repository.hibernate;
 
 import java.util.List;
 

@@ -1,16 +1,16 @@
-package net.bnijik.schooldbcli.repository.group;
+package net.bnijik.schooldbcli.repository;
 
 import net.bnijik.schooldbcli.entity.Group;
-import net.bnijik.schooldbcli.repository.HibernateRepository;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
-import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
+import org.springframework.stereotype.Repository;
 
 import java.util.Optional;
 
-public interface GroupRepository extends JpaRepository<Group, Long>, HibernateRepository<Group> {
+@Repository
+public interface GroupRepository extends SchoolRepository<Group> {
     Optional<Group> findByGroupName(String groupName);
 
     @Query("SELECT g FROM Group g WHERE SIZE(g.students) <= :maxStudentCount")
