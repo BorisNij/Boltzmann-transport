@@ -5,7 +5,7 @@ logging:
 spring:
     datasource:
         driver-class-name: org.testcontainers.jdbc.ContainerDatabaseDriver
-        url: jdbc:tc:postgresql:16.0-alpine3.18:///test?currentSchema=test_school_db&TC_REUSABLE=true
+        url: jdbc:tc:postgresql:16.0-alpine3.18:///test?currentSchema=test_school_db&TC_REUSABLE=true&TC_TMPFS=/testtmpfs:rw
         username: test
         password: test
         hikari:
