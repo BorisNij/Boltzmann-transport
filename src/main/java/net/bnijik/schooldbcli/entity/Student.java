@@ -38,14 +38,33 @@ public class Student {
     @Builder.Default
     private SortedSet<Course> courses = new TreeSet<>();
 
-    public void addCourse(Course course) {
+
+    public void addCourse(@NonNull final Course course) {
         courses.add(course);
         course.students().add(this);
     }
 
-    public void removeCourse(Course course) {
+    public void removeCourse(@NonNull final Course course) {
         courses.remove(course);
         course.students().remove(this);
+    }
+
+    public void addCourses(@NonNull final Collection<Course> courses) {
+        if (courses.contains(null)) {
+            return;
+        }
+
+        this.courses.addAll(courses);
+        courses.forEach(c -> c.students().add(this));
+    }
+
+    public void removeCourses(@NonNull final Collection<Course> courses) {
+        if (courses.contains(null)) {
+            return;
+        }
+
+        this.courses.removeAll(courses);
+        courses.forEach(c -> c.students().remove(this));
     }
 
 
