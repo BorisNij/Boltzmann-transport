@@ -30,8 +30,16 @@
         </encoder>
     </appender>
 
-    <root level="debug">
+    <root level="WARN">
         <appender-ref ref="CONSOLE"/>
-        <appender-ref ref="FILE"/>
     </root>
+
+    <logger name="net.ttddyy.dsproxy.listener.logging.SLF4JQueryLoggingListener" level="ALL" additivity="false">
+        <appender-ref ref="FILE"/>
+    </logger>
+
+    <logger name="org.hibernate.engine.internal.StatisticalLoggingSessionEventListener" level="ALL" additivity="false">
+        <appender-ref ref="FILE"/>
+    </logger>
+
 </configuration>
