@@ -14,6 +14,8 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Slice;
 
 import java.util.Set;
+import java.util.SortedSet;
+import java.util.TreeSet;
 import java.util.stream.Collectors;
 
 @Mapper(componentModel = MappingConstants.ComponentModel.SPRING)
@@ -44,6 +46,12 @@ public abstract class StudentMapper implements SchoolModelMapper<Student, Studen
 
     protected Set<Course> sliceToSet(Slice<CourseDto> courseDtos) {
         return courseDtos.stream().map(d -> courseMapper.dtoToModel(d)).collect(Collectors.toSet());
+    }
+
+    protected SortedSet<Course> sliceToSortedSet(Slice<CourseDto> courseDtos) {
+        return courseDtos.stream()
+                .map(d -> courseMapper.dtoToModel(d))
+                .collect(Collectors.toCollection(TreeSet<Course>::new));
     }
 
 }
