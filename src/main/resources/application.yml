@@ -1,9 +1,12 @@
 logging:
     level:
-        springframework.service: DEBUG
-        org.springframework.aop: DEBUG
-        org.hibernate.SQL: debug
-        org.hibernate.type.descriptor.sql.BasicBinder: trace
+        net.ttddyy.dsproxy.listener: debug
+
+decorator:
+    datasource:
+        datasource-proxy:
+            format-sql: true
+
 
 school:
     max-courses-per-student: ${MAX_COURSES_PER_STUDENT:3}
@@ -23,10 +26,7 @@ spring:
         database-platform: org.hibernate.dialect.PostgreSQLDialect
         properties:
             hibernate:
-                show_sql: false
-                format_sql: true
-                use_sql_comments: true
-                type: trace
+                generate_statistics: true
                 jdbc:
                     batch_size: 20
         open-in-view: false
