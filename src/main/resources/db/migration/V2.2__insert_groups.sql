@@ -1,10 +1,11 @@
-insert into groups (group_name) values ('AB-45');
-insert into groups (group_name) values ('XY-32');
-insert into groups (group_name) values ('PQ-77');
-insert into groups (group_name) values ('CD-88');
-insert into groups (group_name) values ('EF-12');
-insert into groups (group_name) values ('JK-63');
-insert into groups (group_name) values ('LM-99');
-insert into groups (group_name) values ('UV-55');
-insert into groups (group_name) values ('WX-21');
-insert into groups (group_name) values ('RS-76');
+insert into groups (group_name) values
+('AB-45'),
+('PQ-77'),
+('CD-88'),
+('EF-12'),
+('JK-63'),
+('LM-99'),
+('UV-55'),
+('WX-21'),
+('XY-32'),
+('RS-76');
