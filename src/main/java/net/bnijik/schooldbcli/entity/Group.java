@@ -6,7 +6,6 @@ import lombok.experimental.Accessors;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashSet;
 import java.util.List;
 
 @AllArgsConstructor
@@ -34,7 +33,10 @@ public class Group {
     public void students(final List<Student> students) {
         this.students.clear();
         students.stream()
-                .map(s -> new Student(s.studentId(), s.group(), s.firstName(), s.lastName(), new HashSet<>()))
+                .map(s -> new Student().studentId(s.studentId())
+                        .group(s.group())
+                        .firstName(s.firstName())
+                        .lastName(s.lastName()))
                 .forEach(this.students::add);
     }
 
