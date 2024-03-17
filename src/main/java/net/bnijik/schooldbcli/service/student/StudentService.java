@@ -1,7 +1,7 @@
 package net.bnijik.schooldbcli.service.student;
 
 import net.bnijik.schooldbcli.dto.StudentDto;
-import net.bnijik.schooldbcli.service.SchoolAdminService;
+import net.bnijik.schooldbcli.service.schoolAdmin.SchoolAdminService;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 
@@ -15,5 +15,5 @@ public interface StudentService extends SchoolAdminService<StudentDto> {
 
     boolean withdrawFromCourse(long studentId, long courseId);
 
-    long save(String firstName, String lastName, long groupId);
+    StudentDto create(String firstName, String lastName, long groupId);
 }
