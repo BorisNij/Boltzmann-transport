@@ -1,5 +1,6 @@
 package net.bnijik.schooldbcli.menu;
 
+import jakarta.transaction.Transactional;
 import net.bnijik.schooldbcli.dto.CourseDto;
 import net.bnijik.schooldbcli.dto.GroupDto;
 import net.bnijik.schooldbcli.dto.StudentDto;
@@ -36,6 +37,7 @@ public class Menu implements ApplicationRunner {
     }
 
     @Override
+    @Transactional
     public void run(ApplicationArguments args) {
 
         int userChoice = -1;
@@ -173,7 +175,7 @@ public class Menu implements ApplicationRunner {
         String groupName = scanner.nextLine();
 
         final GroupDto group = groupService.findByName(groupName).get();
-        studentService.save(firstName, lastName, group.groupId());
+        studentService.create(firstName, lastName, group.groupId());
     }
 
     private void removeStudent(Scanner scanner) {
